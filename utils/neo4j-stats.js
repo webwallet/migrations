@@ -1,3 +1,4 @@
+const { of } = require('rxjs')
 const { map, flatMap } = require('rxjs/operators')
 const convertPropertiesToNumber = require('./convert-properties-to-number.js')
 
