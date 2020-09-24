@@ -1,3 +1,3 @@
-module.exports = function countNodesByLabel(label) {
-  return `match (node:${label}) return count(node) as nodeCount`
-}
+module.exports = (label) => `
+match (node:${label}) return count(node) as ${label}
+`

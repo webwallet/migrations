@@ -1,7 +1,7 @@
-module.exports = () => `
+module.exports = (param) => `
 call apoc.periodic.iterate(
-  "match (:Transaction)-[rel:Spends]->(:Transaction) return rel",
-  "call apoc.refactor.setType(rel, 'Sources') yield input, output return *",
+  "match (:Transaction)-[spends:Spends]->(:Transaction) return spends",
+  "call apoc.refactor.setType(spends, 'Sources') yield input, output return *",
   {batchSize: 100}
-) yield batch, operations return operations as spendsToSources
+) yield batch, operations return operations as ${param}
 `

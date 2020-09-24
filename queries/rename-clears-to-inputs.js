@@ -1,7 +1,7 @@
-module.exports = () => `
+module.exports = (param) => `
 call apoc.periodic.iterate(
-  "match (:Transaction)-[rel:Clears]->(:IOU) return rel",
-  "call apoc.refactor.setType(rel, 'Inputs') yield input, output return *",
+  "match (:Transaction)-[clears:Clears]->(:IOU) return clears",
+  "call apoc.refactor.setType(clears, 'Inputs') yield input, output return *",
   {batchSize: 100}
-) yield batch, operations return operations as clearsToInputs
+) yield batch, operations return operations as ${param}
 `

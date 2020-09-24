@@ -10,6 +10,7 @@ async function run({ driver }) {
   const rxjsSession = driver.rxSession()
   console.log('running migration...')
   let counters = {before: {}, after: {},queries: {}}
+  let run = runCypherQuery(counters)
 
   concat(
     neo4jStats(rxjsSession, counters, 'before').toPromise(),
@@ -17,11 +18,13 @@ async function run({ driver }) {
       .pipe(
         flatMap(txn =>
           concat(
-            runCypherQuery(queries.countNodesByLabel('Transaction'), 'nodeCount', txn),
-            // of('renaming :Spends to :Sources'),
-            // runCypherQuery(queries.spendsToSources, 'spendsToSources', txn),
-            // of('rename :Clears to :Inputs'),
-            // runCypherQuery(queries.clearsToInputs, 'clearsToInputs', txn),
+            run(queries.countNodesByLabel, 'Transaction', txn),
+            run(queries.bypassAddressIndex, 'addressIndex', txn),
+            run(queries.bypassPointsOutputs, 'bypassOutputs', txn),
+            run(queries.bypassUnspentOutputs, 'bypassUnspent', txn),
+            run(queries.renameSpendsToSources, 'spendsToSources', txn),
+            run(queries.renameClearsToInputs, 'clearsToInputs', txn),
+            run(queries.removeIndexNodes, 'removeIndexes', txn),
             neo4jStats(txn, counters, 'after'),
             txn.rollback(),
             of('committed')
