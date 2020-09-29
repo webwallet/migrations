@@ -1,7 +1,7 @@
 module.exports = (param) => `
 call apoc.periodic.iterate(
-  "match (address:Address)-[:Outputs]->(:Index)-[unspent:Unspent]->(transaction) return *",
-  "call apoc.refactor.from(unspent, address) yield input, output return *",
+  "match (address:Address)-[:Outputs]->(:Index)-[output:Unspent]->(transaction) return *",
+  "merge (address)-[:Unspent {id: output.id}]->(transaction) delete output",
   {batchSize: 100}
 ) yield batch, operations return operations as ${param}
 `
