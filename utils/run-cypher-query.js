@@ -1,4 +1,3 @@
-const { map } = require('rxjs/operators')
 const convertPropertiesToNumber = require('./convert-properties-to-number')
 
 module.exports = (counters) => {
@@ -12,13 +11,3 @@ module.exports = (counters) => {
     return value
   }
 }
-
-// module.exports = (counters) => {
-//   return function run(query, param, txn) {
-//     return txn.run(query(param))
-//       .records().pipe(map(record => {
-//         return convertPropertiesToNumber(param ? record.get(param) : record.get('updates'))
-//       }))
-//       .toPromise().then(value => counters.queries[param] = value)
-//   }
-// }

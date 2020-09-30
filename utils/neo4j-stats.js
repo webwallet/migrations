@@ -1,15 +1,13 @@
-const { of } = require('rxjs')
-const { map, flatMap } = require('rxjs/operators')
 const convertPropertiesToNumber = require('./convert-properties-to-number.js')
 
-module.exports = function neo4jstats(txn, counters, moment) {
-  return txn.run(`CALL apoc.meta.stats()`)
-    .records().pipe(map(record => record.keys
+module.exports = async function neo4jstats(txn, counters, moment) {
+  let result = await txn.run(`CALL apoc.meta.stats()`)
+  let stats = result.records.map(record => {
+    return record.keys
       .map(key => ({[key]: record.get(key)}))
       .reduce((stats, stat) => ({stats, ...stat}), {})
-    ))
-    .pipe(flatMap(({ stats }) => {
-      counters[moment] = convertPropertiesToNumber(stats)
-      return of(stats)
-    }))
+  }).map(({ stats }) => convertPropertiesToNumber(stats))
+  
+  counters[moment] = stats[0]
+  return counters[moment]
 }
