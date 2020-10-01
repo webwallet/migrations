@@ -1,10 +1,11 @@
 module.exports = (param) => `
 call apoc.periodic.iterate(
-  "match (space:Countspace)-[:Addresses]->(:Index)-[pointer:Address]->(address:Address) return *",
-  "merge (space)-[:Addresses]->(address) delete pointer",
+  "match (countspace:Countspace)-[:Addresses]->(:Index)-[pointer:Address]->(address:Address) return *",
+  "set address.symbol = countspace.id delete pointer",
   {batchSize: 100}
 ) yield batch, operations return operations as ${param}
 `
+// "merge (space)-[:Addresses]->(address) delete pointer",
 
 // module.exports = (limit) => `
 // call apoc.periodic.commit(
