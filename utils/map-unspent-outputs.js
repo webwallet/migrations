@@ -10,9 +10,8 @@ module.exports = (driver, query) => {
     .records()
     .pipe(
       map(record => {
-        let [address, symbol, pointer] = ['address', 'symbol', 'pointer'].map(key => record.get(key))
-        let addressSymbolKey = [address, symbol].join('::')
-        return outputs[addressSymbolKey] = [...(outputs[addressSymbolKey] || []), pointer]
+        let [address, pointer] = ['address', 'pointer'].map(key => record.get(key))
+        return outputs[address] = [...(outputs[address] || []), pointer]
       }),
       concat(rxSession.close())
     )

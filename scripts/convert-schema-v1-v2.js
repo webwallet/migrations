@@ -12,7 +12,7 @@ async function run({ driver }) {
   let startTime = (new Date()).getTime()
   console.log('running migration...')
 
-  // responses.before.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV1())
+  responses.before.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV1())
   let neo4jStatsBefore = await neo4jStats(session, counters, 'before')
 
   let bypassAddressIndex = await session.writeTransaction(async txn => {
@@ -49,7 +49,7 @@ async function run({ driver }) {
   })
 
   let neo4jStatsAfter = await neo4jStats(session, counters, 'after')
-  // responses.after.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV2())
+  responses.after.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV2())
 
   console.log(counters.before)
   console.log(counters.after)
@@ -81,6 +81,12 @@ async function validateMigration({ counters, responses }) {
                    === counters.after.relTypes['()-[:Unspent]->(:Transaction)'],
       iouClearsToInputs: counters.before.relTypes['()-[:Clears]->(:IOU)']
                       === counters.after.relTypes['()-[:Inputs]->(:IOU)'],
+    },
+    matches: {
+      unspentBefore: Object.values(responses.before.unspentOutputs).reduce((count, array) => count + array.length, 0),
+      unspentAfter: Object.values(responses.after.unspentOutputs).reduce((count, array) => count + array.length, 0),
+      unspentStrings: compareKeysAndArrayValues(responses.before.unspentOutputs, responses.after.unspentOutputs),
+      unspentTotal: counters.before.relTypes['()-[:Unspent]->(:Transaction)']
     }
   }
 
@@ -89,6 +95,23 @@ async function validateMigration({ counters, responses }) {
 
   console.log(validations)
   return validations
+}
+
+function compareKeysAndArrayValues(objectBefore, objectAfter) {
+  let totalMatched = 0
+
+  Object.entries(objectBefore).forEach(([keyBefore, arrayBefore]) => {
+    let arrayAfter = objectAfter[keyBefore]
+    if (arrayAfter && arrayAfter.length === arrayBefore.length) {
+      arrayBefore.forEach(elementBefore => {
+        if (arrayAfter.includes(elementBefore)) {
+          totalMatched += 1
+        }
+      })
+    }
+  })
+
+  return totalMatched
 }
 
 module.exports = {
