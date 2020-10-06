@@ -8,6 +8,9 @@ const renameClearsToInputs = require('./rename-clears-to-inputs')
 const renameSpendsToSources = require('./rename-spends-to-sources')
 const removeIndexNodes = require('./remove-index-nodes')
 
+const unspentOutputsV1 = require('./unspent-outputs-v1')
+const unspentOutputsV2 = require('./unspent-outputs-v2')
+
 module.exports = {
   countNodesByLabel,
   bypassAddressIndex,
@@ -15,5 +18,7 @@ module.exports = {
   bypassUnspentOutputs,
   renameClearsToInputs,
   renameSpendsToSources,
-  removeIndexNodes
+  removeIndexNodes,
+  unspentOutputsV1,
+  unspentOutputsV2
 }
