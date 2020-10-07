@@ -6,6 +6,8 @@ const bypassUnspentOutputs = require('./bypass-unspent-outputs')
 
 const renameClearsToInputs = require('./rename-clears-to-inputs')
 const renameSpendsToSources = require('./rename-spends-to-sources')
+
+const removeAddressNodes = require('./remove-address-nodes')
 const removeIndexNodes = require('./remove-index-nodes')
 
 const unspentOutputsV1 = require('./unspent-outputs-v1')
@@ -18,6 +20,7 @@ module.exports = {
   bypassUnspentOutputs,
   renameClearsToInputs,
   renameSpendsToSources,
+  removeAddressNodes,
   removeIndexNodes,
   unspentOutputsV1,
   unspentOutputsV2

@@ -15,10 +15,10 @@ async function run({ driver }) {
   responses.before.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV1())
   let neo4jStatsBefore = await neo4jStats(session, counters, 'before')
 
-  let bypassAddressIndex = await session.writeTransaction(async txn => {
-    return await runQuery(queries.bypassAddressIndex, 'addressIndex', txn)
-  })
-  console.log(bypassAddressIndex)
+  // let bypassAddressIndex = await session.writeTransaction(async txn => {
+  //   return await runQuery(queries.bypassAddressIndex, 'addressIndex', txn)
+  // })
+  // console.log(bypassAddressIndex)
 
   let bypassUnspentOutputs = await session.writeTransaction(async txn => {
     return await runQuery(queries.bypassUnspentOutputs, 'bypassUnspent', txn)
@@ -39,6 +39,11 @@ async function run({ driver }) {
     return await runQuery(queries.renameClearsToInputs, 'clearsToInputs', txn)
   })
   console.log(renameClearsToInputs)
+
+  let removeAddressNodes = await session.writeTransaction(async txn => {
+    return await runQuery(queries.removeAddressNodes, 'removeAddressNodes', txn)
+  })
+  console.log(removeAddressNodes)
 
   let removeIndexNodes = await session.writeTransaction(async txn => {
     let result = await txn.run(queries.removeIndexNodes())
@@ -63,7 +68,7 @@ async function run({ driver }) {
 async function validateMigration({ counters, responses }) {
   let validations = {
     nodes: {
-      addresses: counters.before.labels.Address === counters.after.labels.Address,
+      addresses: counters.before.relTypes['(:Address)-[:Outputs]->()'] === counters.after.labels.Address, //
       transactions: counters.before.labels.Transaction === counters.after.labels.Transaction,
       ious: counters.before.labels.IOU === counters.after.labels.IOU,
       noIndexes: !counters.after.labels.Index
