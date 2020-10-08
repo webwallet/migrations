@@ -7,6 +7,9 @@ const bypassUnspentOutputs = require('./bypass-unspent-outputs')
 const renameClearsToInputs = require('./rename-clears-to-inputs')
 const renameSpendsToSources = require('./rename-spends-to-sources')
 
+const createIOUConstraint = require('./create-iou-constraint')
+const createAddressConstraint = require('./create-address-constraint')
+
 const removeAddressNodes = require('./remove-address-nodes')
 const removeIndexNodes = require('./remove-index-nodes')
 
@@ -20,6 +23,8 @@ module.exports = {
   bypassUnspentOutputs,
   renameClearsToInputs,
   renameSpendsToSources,
+  createIOUConstraint,
+  createAddressConstraint,
   removeAddressNodes,
   removeIndexNodes,
   unspentOutputsV1,

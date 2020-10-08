@@ -12,13 +12,12 @@ async function run({ driver }) {
   let startTime = (new Date()).getTime()
   console.log('running migration...')
 
+  let createIOUConstraint = await session.writeTransaction(async txn => {
+    return await runQuery(queries.createIOUConstraint, 'createIOUConstraint', txn)
+  })
+
   responses.before.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV1())
   let neo4jStatsBefore = await neo4jStats(session, counters, 'before')
-
-  // let bypassAddressIndex = await session.writeTransaction(async txn => {
-  //   return await runQuery(queries.bypassAddressIndex, 'addressIndex', txn)
-  // })
-  // console.log(bypassAddressIndex)
 
   let bypassUnspentOutputs = await session.writeTransaction(async txn => {
     return await runQuery(queries.bypassUnspentOutputs, 'bypassUnspent', txn)
@@ -53,12 +52,16 @@ async function run({ driver }) {
     return value
   })
 
+  let createAddressConstraint = await session.writeTransaction(async txn => {
+    return await runQuery(queries.createAddressConstraint, 'createAddressConstraint', txn)
+  })
+
   let neo4jStatsAfter = await neo4jStats(session, counters, 'after')
   responses.after.unspentOutputs = await mapUnspentOutputs(driver, queries.unspentOutputsV2())
 
-  console.log(counters.before)
-  console.log(counters.after)
-  console.log(counters.queries)
+  console.log('before:', counters.before)
+  console.log('after:', counters.after)
+  console.log('queries:', counters.queries)
 
   await validateMigration({counters, responses})
 
